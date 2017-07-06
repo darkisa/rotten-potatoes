@@ -13,11 +13,12 @@ class MoviesController < ApplicationController
   def index
     # get the unique ratings values from the movie database
     @all_ratings = Movie.uniq.pluck(:rating)
-    # get the title that was clicked from the index view
+    # get the title that was clicked from the index view 
     if params[:title]
+      @title = params[:title]
       session[:title] = params[:title]
     end
-    # get the selected ratings
+    # get the selected ratings ad store it in the session hash
     if params[:ratings]
       session[:ratings] = params[:ratings]
     end
