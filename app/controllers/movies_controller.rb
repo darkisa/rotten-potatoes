@@ -11,12 +11,31 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @title = params[:title]
-    case @title
-      when nil then @movies = Movie.all
-      when "Movie Title" then @movies = Movie.all.order(title: :asc)
-      when "Release Date" then @movies = Movie.all.order(release_date: :asc)
-      else @movies = Movie.all
+    # get the unique ratings values from the movie database
+    @all_ratings = Movie.uniq.pluck(:rating)
+    # get the title that was clicked from the index view
+    if params[:title]
+      session[:title] = params[:title]
+    end
+    # get the selected ratings
+    if params[:ratings]
+      session[:ratings] = params[:ratings]
+    end
+    # sort the table in the view based on the header that was clicked
+    if session[:title] && session[:ratings]
+      case session[:title]
+        when "Movie Title" then @movies = Movie.where(rating: session[:ratings].keys).order(title: :asc)
+        when "Release Date" then @movies = Movie.where(rating: session[:ratings].keys).order(release_date: :asc)
+      end
+    elsif session[:title]
+      case session[:title]
+        when "Movie Title" then @movies = Movie.all.order(title: :asc)
+        when "Release Date" then @movies = Movie.all.order(release_date: :asc)
+      end
+    elsif session[:ratings]
+      @movies = Movie.where(rating: session[:ratings].keys)
+    else
+      @movies = Movie.all
     end
   end
 
