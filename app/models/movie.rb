@@ -6,7 +6,7 @@ class Movie < ActiveRecord::Base
 
   def self.sort_and_filter(title, ratings)
     if title && ratings
-      all.where(rating: ratings).order(title)
+      all.where(rating: ratings.flatten).order(title)
     else all
     end
   end
