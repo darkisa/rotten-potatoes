@@ -49,6 +49,8 @@ class MoviesController < ApplicationController
   def check_nil(object, all_ratings)
     if object 
       return object.keys.to_a
+    elsif session[:ratings]
+      return session[:ratings]
     else all_ratings
     end
   end
@@ -57,7 +59,7 @@ class MoviesController < ApplicationController
     if title 
       session[:title] = title
     end
-    if !selected_ratings.empty?
+    if selected_ratings
       session[:ratings] = selected_ratings
     end
   end
