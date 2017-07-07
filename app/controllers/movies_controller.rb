@@ -12,8 +12,11 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.get_ratings # get the unique ratings values from the movie database
-    @selected_ratings = check_nil(params[:ratings], @all_ratings)
-    @title = params[:title]
+    @selected_ratings = get_selected_ratings(params[:ratings], @all_ratings)
+    if params[:title]
+      @title = params[:title]
+    else @title = "title"
+    end
     set_session(@title, @selected_ratings)
     @movies = Movie.sort_and_filter(session[:title], session[:ratings])
   end
@@ -46,7 +49,7 @@ class MoviesController < ApplicationController
     redirect_to movies_path
   end
 
-  def check_nil(object, all_ratings)
+  def get_selected_ratings(object, all_ratings)
     if object 
       return object.keys.to_a
     elsif session[:ratings]
