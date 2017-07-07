@@ -11,33 +11,11 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # get the unique ratings values from the movie database
-    @all_ratings = Movie.uniq.pluck(:rating)
-    # get the title that was clicked from the index view 
-    if params[:title]
-      @title = params[:title]
-      session[:title] = params[:title]
-    end
-    # get the selected ratings ad store it in the session hash
-    if params[:ratings]
-      session[:ratings] = params[:ratings]
-    end
-    # sort the table in the view based on the header that was clicked
-    if session[:title] && session[:ratings]
-      case session[:title]
-        when "Movie Title" then @movies = Movie.where(rating: session[:ratings].keys).order(title: :asc)
-        when "Release Date" then @movies = Movie.where(rating: session[:ratings].keys).order(release_date: :asc)
-      end
-    elsif session[:title]
-      case session[:title]
-        when "Movie Title" then @movies = Movie.all.order(title: :asc)
-        when "Release Date" then @movies = Movie.all.order(release_date: :asc)
-      end
-    elsif session[:ratings]
-      @movies = Movie.where(rating: session[:ratings].keys)
-    else
-      @movies = Movie.all
-    end
+    @all_ratings = Movie.get_ratings # get the unique ratings values from the movie database
+    @selected_ratings = check_nil(params[:ratings], @all_ratings)
+    @title = params[:title]
+    set_session(@title, @selected_ratings)
+    @movies = Movie.sort_and_filter(session[:title], session[:ratings])
   end
 
   def new
@@ -66,6 +44,22 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
+  end
+
+  def check_nil(object, all_ratings)
+    if object 
+      return object.keys.to_a
+    else all_ratings
+    end
+  end
+
+  def set_session(title, selected_ratings)
+    if title 
+      session[:title] = title
+    end
+    if !selected_ratings.empty?
+      session[:ratings] = selected_ratings
+    end
   end
 
 end
