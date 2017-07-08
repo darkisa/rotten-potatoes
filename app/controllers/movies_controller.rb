@@ -20,7 +20,7 @@ class MoviesController < ApplicationController
 
     if !@selected_ratings || !@title
       @selected_ratings =  get_selected_ratings() unless @selected_ratings
-      @title = session[:title] unless @title
+      @title = get_title() unless @title
       # redirect back to the index with the approproate variables in the params hash
       redirect_to movies_path({ratings: @selected_ratings, title: @title}) 
     end
